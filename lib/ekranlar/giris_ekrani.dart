@@ -118,24 +118,28 @@ class _GirisEkraniState extends State<GirisEkrani> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Logo ve uygulama adı
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.accessible,
-                        size: 56,
-                        color: Color(0xFF00695C),
+                    Semantics(
+                      label: 'Engelsiz Yaşam erişilebilirlik logosu',
+                      image: true,
+                      child: Container(
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.accessible,
+                          size: 56,
+                          color: Color(0xFF00695C),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -152,7 +156,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
                     Text(
                       'Herkes için erişilebilir bir yaşam',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
+                        color: Colors.white.withValues(alpha: 0.95),
                         fontSize: 14,
                       ),
                     ),
@@ -193,6 +197,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
                                   TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               autofillHints: const [AutofillHints.email],
+                              autofocus: true,
                               decoration: const InputDecoration(
                                 labelText: 'E-posta',
                                 hintText: 'ornek@eposta.com',
@@ -336,7 +341,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
                     Text(
                       'Sürüm 1.0.0',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Colors.white.withValues(alpha: 0.75),
                         fontSize: 12,
                       ),
                     ),

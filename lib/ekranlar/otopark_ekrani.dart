@@ -57,7 +57,10 @@ class _OtoparkEkraniState extends State<OtoparkEkrani> {
         backgroundColor: const Color(0xFF00695C),
         foregroundColor: Colors.white,
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 860),
+          child: Column(
         children: [
           // Arama kutusu
           Padding(
@@ -109,7 +112,7 @@ class _OtoparkEkraniState extends State<OtoparkEkrani> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 '${liste.length} park yeri listelendi',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
+                style: TextStyle(color: Colors.grey.shade800, fontSize: 12.5),
               ),
             ),
           ),
@@ -125,7 +128,9 @@ class _OtoparkEkraniState extends State<OtoparkEkrani> {
                         _ParkKarti(park: liste[index]),
                   ),
           ),
-        ],
+          ],
+          ),
+        ),
       ),
     );
   }
@@ -160,7 +165,7 @@ class _OtoparkEkraniState extends State<OtoparkEkrani> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
+            Icon(Icons.search_off, size: 64, color: Colors.grey.shade800),
             const SizedBox(height: 12),
             const Text(
               'Sonuç bulunamadı',
@@ -170,7 +175,7 @@ class _OtoparkEkraniState extends State<OtoparkEkrani> {
             Text(
               'Arama veya filtreleri değiştirmeyi deneyin.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: Colors.grey.shade800),
             ),
           ],
         ),
@@ -236,7 +241,7 @@ class _ParkKarti extends StatelessWidget {
                       park.adres,
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: Colors.grey.shade600,
+                        color: Colors.grey.shade800,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

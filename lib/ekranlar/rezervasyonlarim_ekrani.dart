@@ -197,7 +197,7 @@ class _RezervasyonlarimEkraniState extends State<RezervasyonlarimEkrani> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.event_busy, size: 64, color: Colors.grey.shade400),
+            Icon(Icons.event_busy, size: 64, color: Colors.grey.shade800),
             const SizedBox(height: 12),
             const Text(
               'Henüz rezervasyonunuz yok',
@@ -208,7 +208,7 @@ class _RezervasyonlarimEkraniState extends State<RezervasyonlarimEkrani> {
               'Menüden Otopark bölümüne gidip engelli park yerleri için '
               'rezervasyon yapabilirsiniz.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: Colors.grey.shade800),
             ),
             const SizedBox(height: 16),
             FilledButton.icon(

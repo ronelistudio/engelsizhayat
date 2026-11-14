@@ -133,7 +133,10 @@ class MenuEkrani extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Karşılama bandı
@@ -176,7 +179,7 @@ class MenuEkrani extends StatelessWidget {
                       Text(
                         '${_selamlama()},',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white.withValues(alpha: 0.95),
                           fontSize: 14,
                         ),
                       ),
@@ -192,7 +195,7 @@ class MenuEkrani extends StatelessWidget {
                       Text(
                         _bugun(),
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 12,
                         ),
                       ),
@@ -210,14 +213,15 @@ class MenuEkrani extends StatelessWidget {
           const SizedBox(height: 10),
 
           // Bölüm kartları
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.92,
-            children: [
+          LayoutBuilder(
+            builder: (context, constraints) => GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: constraints.maxWidth >= 760 ? 4 : 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: constraints.maxWidth >= 760 ? 0.78 : 0.92,
+              children: [
               for (final bolum in bolumler)
                 _BolumKartWidget(
                   kart: bolum,
@@ -240,7 +244,8 @@ class MenuEkrani extends StatelessWidget {
                     }
                   },
                 ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -275,9 +280,11 @@ class MenuEkrani extends StatelessWidget {
           Text(
             'Engelsiz Yaşam — Herkes için erişilebilir bir yaşam',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade800),
           ),
-        ],
+          ],
+        ),
+        ),
       ),
     );
   }
@@ -342,7 +349,8 @@ class _BolumKartWidget extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     kart.aciklama,
-                    style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+                    style:
+                        TextStyle(fontSize: 11.5, color: Colors.grey.shade800),
                   ),
                 ],
               ),

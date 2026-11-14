@@ -370,7 +370,7 @@ class _RezervasyonEkraniState extends State<RezervasyonEkrani> {
           deger,
           style: TextStyle(
             fontSize: 15,
-            color: deger == 'Seçin' ? Colors.grey.shade600 : Colors.black87,
+            color: deger == 'Seçin' ? Colors.grey.shade800 : Colors.black87,
             fontWeight: FontWeight.w600,
           ),
         ),

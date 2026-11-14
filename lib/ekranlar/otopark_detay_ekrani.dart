@@ -140,18 +140,30 @@ class OtoparkDetayEkrani extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${parkYeri.bosYer} / ${parkYeri.toplamEngelliYeri} yer boş',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: boslukVar
-                              ? Colors.green.shade800
-                              : Colors.red.shade800,
-                        ),
+                      Row(
+                        children: [
+                          Icon(
+                            boslukVar ? Icons.event_available : Icons.event_busy,
+                            size: 18,
+                            color: boslukVar
+                                ? Colors.green.shade800
+                                : Colors.red.shade800,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${parkYeri.bosYer} / ${parkYeri.toplamEngelliYeri} yer boş',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: boslukVar
+                                  ? Colors.green.shade800
+                                  : Colors.red.shade800,
+                            ),
+                          ),
+                        ],
                       ),
                       Text(
                         '$dolu dolu',
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: TextStyle(color: Colors.grey.shade800),
                       ),
                     ],
                   ),
@@ -172,7 +184,7 @@ class OtoparkDetayEkrani extends StatelessWidget {
                     boslukVar
                         ? 'Rezervasyon yaparak yerinizi ayırtabilirsiniz.'
                         : 'Şu an tüm yerler dolu. İlerleyen saatlerde tekrar kontrol edin.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade800),
                   ),
                 ],
               ),
@@ -274,7 +286,7 @@ class OtoparkDetayEkrani extends StatelessWidget {
       ),
       title: Text(
         baslik,
-        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade800),
       ),
       subtitle: Text(
         deger,
