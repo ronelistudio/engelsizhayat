@@ -1,7 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'giris_ekrani.dart';
 import 'otopark_ekrani.dart';
 import 'rezervasyonlarim_ekrani.dart';
 
@@ -12,41 +10,6 @@ class MenuEkrani extends StatelessWidget {
   final String email;
 
   const MenuEkrani({super.key, required this.ad, required this.email});
-
-  Future<void> _cikisYap(BuildContext context) async {
-    final onay = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Hesabınızdan çıkmak istediğinize emin misiniz?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Vazgeç'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              'Çıkış Yap',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (onay != true || !context.mounted) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('giris_yapildi');
-    await prefs.remove('kullanici_ad');
-    await prefs.remove('kullanici_email');
-
-    if (!context.mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const GirisEkrani()),
-      (rota) => false,
-    );
-  }
 
   String _selamlama() {
     final s = DateTime.now().hour;
@@ -103,42 +66,56 @@ class MenuEkrani extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Row(
+      backgroundColor: const Color(0xFFF4F8F7),
+      body: SafeArea(
+        bottom: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 96),
           children: [
-            Icon(Icons.accessible, size: 26),
-            SizedBox(width: 8),
-            Text(
-              'Engelsiz Yaşam',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF00695C),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            tooltip: 'Rezervasyonlarım',
-            icon: const Icon(Icons.event_available),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const RezervasyonlarimEkrani(),
-              ),
+          // Sayfa başlığı (hap gezinmenin üstünde kendi başlığı var)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00695C),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.accessible,
+                      color: Colors.white, size: 24),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Engelsiz Yaşam',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF004D40),
+                        ),
+                      ),
+                      Text(
+                        'Herkes için erişilebilir bir yaşam',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          IconButton(
-            tooltip: 'Çıkış Yap',
-            icon: const Icon(Icons.logout),
-            onPressed: () => _cikisYap(context),
-          ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
           // Karşılama bandı
           Container(
             padding: const EdgeInsets.all(20),
@@ -283,7 +260,8 @@ class MenuEkrani extends StatelessWidget {
             style: TextStyle(fontSize: 11, color: Colors.grey.shade800),
           ),
           ],
-        ),
+            ),
+          ),
         ),
       ),
     );
