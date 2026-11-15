@@ -20,6 +20,7 @@ class PanelEkrani extends StatefulWidget {
 
 class _PanelEkraniState extends State<PanelEkrani> {
   int _index = 0;
+  late String _ad;
 
   static const _sekmeler = [
     (ikon: Icons.home_rounded, etiket: 'Ana Menü'),
@@ -28,15 +29,30 @@ class _PanelEkraniState extends State<PanelEkrani> {
     (ikon: Icons.person_outline, etiket: 'Profil'),
   ];
 
-  late final List<Widget> _sayfalar = [
-    MenuEkrani(ad: widget.ad, email: widget.email),
-    const Scaffold(
-      backgroundColor: Color(0xFFF4F8F7),
-      body: SafeArea(bottom: false, child: RezervasyonlarimGovde()),
-    ),
-    const HizmetlerimizEkrani(),
-    ProfilEkrani(ad: widget.ad, email: widget.email),
-  ];
+  List<Widget>? _sayfalar;
+
+  List<Widget> _sayfalariOlustur() => [
+        MenuEkrani(ad: _ad, email: widget.email),
+        const Scaffold(
+          backgroundColor: Color(0xFFF4F8F7),
+          body: SafeArea(bottom: false, child: RezervasyonlarimGovde()),
+        ),
+        const HizmetlerimizEkrani(),
+        ProfilEkrani(
+          ad: _ad,
+          email: widget.email,
+          onGuncelle: (yeniAd) => setState(() {
+            _ad = yeniAd;
+            _sayfalar = null; // ad güncellenince sayfalar yenilenir
+          }),
+        ),
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    _ad = widget.ad;
+  }
 
   void _qrTeknik(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +69,7 @@ class _PanelEkraniState extends State<PanelEkrani> {
       extendBody: true,
       body: IndexedStack(
         index: _index,
-        children: _sayfalar,
+        children: _sayfalar ??= _sayfalariOlustur(),
       ),
       bottomNavigationBar: SafeArea(
         top: false,

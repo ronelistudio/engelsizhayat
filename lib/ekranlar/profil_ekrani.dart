@@ -1,16 +1,72 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../erisilebilirlik/erisilebilirlik.dart';
 import 'giris_ekrani.dart';
 import 'rezervasyonlarim_ekrani.dart';
 
-/// "Profil" sekmesi — kullanıcı bilgileri ve tercihler.
-class ProfilEkrani extends StatelessWidget {
+/// "Profil" sekmesi — kullanıcı bilgileri.
+/// Ad soyad ve telefon düzenlenebilir; kaydedilince uygulamaya yansır.
+class ProfilEkrani extends StatefulWidget {
   final String ad;
   final String email;
+  final ValueChanged<String> onGuncelle;
 
-  const ProfilEkrani({super.key, required this.ad, required this.email});
+  const ProfilEkrani({
+    super.key,
+    required this.ad,
+    required this.email,
+    required this.onGuncelle,
+  });
+
+  @override
+  State<ProfilEkrani> createState() => _ProfilEkraniState();
+}
+
+class _ProfilEkraniState extends State<ProfilEkrani> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _adController;
+  late final TextEditingController _telefonController;
+  bool _kaydediliyor = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _adController = TextEditingController(text: widget.ad);
+    _telefonController = TextEditingController();
+    _telefonYukle();
+  }
+
+  Future<void> _telefonYukle() async {
+    final prefs = await SharedPreferences.getInstance();
+    _telefonController.text = prefs.getString('kullanici_telefon') ?? '';
+  }
+
+  @override
+  void dispose() {
+    _adController.dispose();
+    _telefonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _kaydet() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _kaydediliyor = true);
+    final yeniAd = _adController.text.trim();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('kullanici_ad', yeniAd);
+    await prefs.setString('kullanici_telefon', _telefonController.text.trim());
+    if (!mounted) return;
+    setState(() => _kaydediliyor = false);
+
+    widget.onGuncelle(yeniAd); // Ana Menü karşılama vb. yerlere yansır
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text('Profiliniz güncellendi.'),
+      ),
+    );
+  }
 
   Future<void> _cikisYap(BuildContext context) async {
     final onay = await showDialog<bool>(
@@ -49,16 +105,17 @@ class ProfilEkrani extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final erisilebilirlik = ErisilebilirlikKapsam.of(context);
+    final ad = widget.ad;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8F7),
       body: SafeArea(
+        bottom: false,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.only(bottom: 96),
               children: [
                 // ── Profil başlığı ──
                 Container(
@@ -74,7 +131,7 @@ class ProfilEkrani extends StatelessWidget {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        radius: 40,
+                        radius: 42,
                         backgroundColor: Colors.white,
                         child: Text(
                           ad.isNotEmpty ? ad[0].toUpperCase() : 'K',
@@ -96,34 +153,10 @@ class ProfilEkrani extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        email,
+                        widget.email,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.verified,
-                                size: 15, color: Colors.white),
-                            SizedBox(width: 6),
-                            Text(
-                              'Engelsiz Yaşam Üyesi',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 11),
-                            ),
-                          ],
                         ),
                       ),
                     ],
@@ -132,88 +165,99 @@ class ProfilEkrani extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // ── Araçlarım ve Kartlarım ──
-                _bolumBaslik('Kartlarım'),
+                // ── Profil bilgilerim ──
+                _bolumBaslik('Profil Bilgilerim'),
                 Card(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Color(0xFFE0F2F1),
-                      child: Icon(Icons.credit_card, color: Color(0xFF00695C)),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _adController,
+                            textCapitalization:
+                                TextCapitalization.words,
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                              labelText: 'Ad Soyad',
+                              prefixIcon: const Icon(Icons.person_outline),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(14),
+                              ),
+                            ),
+                            validator: (v) {
+                              if (v == null || v.trim().length < 3) {
+                                return 'Adınızı soyadınızı yazın';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _telefonController,
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _kaydet(),
+                            decoration: InputDecoration(
+                              labelText: 'Telefon',
+                              hintText: '05xx xxx xx xx',
+                              prefixIcon: const Icon(Icons.phone_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(14),
+                              ),
+                            ),
+                            validator: (v) {
+                              final rakamlar = (v ?? '')
+                                  .replaceAll(RegExp(r'\D'), '');
+                              if (rakamlar.isNotEmpty &&
+                                  (rakamlar.length < 10 ||
+                                      rakamlar.length > 13)) {
+                                return 'Geçerli bir telefon numarası yazın';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            height: 50,
+                            child: FilledButton.icon(
+                              onPressed: _kaydediliyor ? null : _kaydet,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF00695C),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(14),
+                                ),
+                              ),
+                              icon: _kaydediliyor
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.save_outlined),
+                              label: const Text(
+                                'Kaydet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    title: Text('Engelli Araç Kartı'),
-                    subtitle: Text('Doğrulandı'),
-                    trailing: Icon(Icons.check_circle, color: Colors.green),
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // ── Erişilebilirlik tercihlerim ──
-                _bolumBaslik('Erişilebilirlik Tercihlerim'),
-                Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      SwitchListTile(
-                        secondary: const Icon(Icons.contrast,
-                            color: Color(0xFF00695C)),
-                        title: const Text('Yüksek kontrast'),
-                        subtitle: const Text(
-                            'Siyah zemin, sarı vurgu — AAA kontrast'),
-                        value: erisilebilirlik.yuksekKontrast,
-                        activeThumbColor: const Color(0xFF00695C),
-                        onChanged: (_) =>
-                            erisilebilirlik.yuksekKontrastDegistir(),
-                      ),
-                      SwitchListTile(
-                        secondary: const Icon(Icons.filter_b_and_w,
-                            color: Color(0xFF00695C)),
-                        title: const Text('Gri tonlama'),
-                        subtitle:
-                            const Text('Renk bilgisini kaldır'),
-                        value: erisilebilirlik.griTon,
-                        activeThumbColor: const Color(0xFF00695C),
-                        onChanged: (_) => erisilebilirlik.griTonDegistir(),
-                      ),
-                      SwitchListTile(
-                        secondary: const Icon(Icons.format_underlined,
-                            color: Color(0xFF00695C)),
-                        title: const Text('Altı çizili bağlantılar'),
-                        value: erisilebilirlik.altiCiziliBaglantilar,
-                        activeThumbColor: const Color(0xFF00695C),
-                        onChanged: (_) =>
-                            erisilebilirlik.altiCiziliBaglantilarDegistir(),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.text_fields,
-                            color: Color(0xFF00695C)),
-                        title: const Text('Metin boyutu'),
-                        subtitle: Text(
-                            'Şu an: %${(erisilebilirlik.fontOlcegi * 100).round()}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              tooltip: 'Yazıyı küçült',
-                              icon: const Icon(Icons.text_decrease),
-                              onPressed: erisilebilirlik.fontKucult,
-                            ),
-                            IconButton(
-                              tooltip: 'Yazıyı büyüt',
-                              icon: const Icon(Icons.text_increase),
-                              onPressed: erisilebilirlik.fontBuyut,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ),
                 ),
 
@@ -235,8 +279,8 @@ class ProfilEkrani extends StatelessWidget {
                               color: Color(0xFF00695C)),
                         ),
                         title: const Text('Rezervasyonlarım'),
-                        subtitle: const Text(
-                            'Otopark rezervasyonlarınızı görüntüleyin'),
+                        subtitle:
+                            const Text('Otopark rezervasyonlarınızı görüntüleyin'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
@@ -277,7 +321,8 @@ class ProfilEkrani extends StatelessWidget {
                       onPressed: () => _cikisYap(context),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red, width: 1.5),
+                        side: const BorderSide(
+                            color: Colors.red, width: 1.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
